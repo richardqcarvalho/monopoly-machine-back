@@ -8,9 +8,9 @@ export const playersTable = pgTable('players', {
 export const roomsTable = pgTable('rooms', {
 	id: uuid().primaryKey().unique().defaultRandom(),
 	players: uuid()
+		.references(() => playersTable.id)
 		.array()
-		.notNull()
-		.references(() => playersTable.id),
+		.notNull(),
 	banker: uuid()
 		.notNull()
 		.references(() => playersTable.id),
@@ -19,14 +19,14 @@ export const roomsTable = pgTable('rooms', {
 export const transfersTable = pgTable('transfers', {
 	id: uuid().primaryKey().unique().defaultRandom(),
 	from: uuid()
-		.notNull()
-		.references(() => playersTable.id),
+		.references(() => playersTable.id)
+		.notNull(),
 	to: uuid()
-		.notNull()
-		.references(() => playersTable.id),
+		.references(() => playersTable.id)
+		.notNull(),
 	amount: integer().notNull(),
 	room: uuid()
-		.notNull()
+		.references(() => roomsTable.id)
 		.unique()
-		.references(() => roomsTable.id),
+		.notNull(),
 })
