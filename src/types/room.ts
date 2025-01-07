@@ -5,3 +5,8 @@ export type GetRoomT = {
 export type CreateRoomT = {
 	playerId: string
 }
+
+export type EditRoomT = {
+	players?: string[]
+	banker?: string
+}
