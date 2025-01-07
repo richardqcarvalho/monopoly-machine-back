@@ -31,3 +31,18 @@ export const createPlayer: RouteHandlerMethod = async (request, reply) => {
 
 	return reply.send(player)
 }
+
+export const editPlayer: RouteHandlerMethod = async (request, reply) => {
+	const { name } = request.body as CreatePlayerT
+	const { playerId } = request.params as GetPlayerT
+
+	const [player] = await db
+		.update(playersTable)
+		.set({
+			name,
+		})
+		.where(eq(playersTable.id, playerId))
+		.returning()
+
+	return reply.send(player)
+}

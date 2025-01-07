@@ -1,6 +1,11 @@
 import fastifyCors from '@fastify/cors'
 import fastify from 'fastify'
-import { createPlayer, getPlayer, getPlayers } from './routes/player.js'
+import {
+	createPlayer,
+	editPlayer,
+	getPlayer,
+	getPlayers,
+} from './routes/player.js'
 import {
 	createRoom,
 	deleteRoom,
@@ -19,6 +24,7 @@ fastify()
 	.get('/players', getPlayers)
 	.get('/player/:playerId', getPlayer)
 	.post('/player', createPlayer)
+	.put('/player/:playerId', editPlayer)
 	.listen({
 		port: 4000,
 		host: '0.0.0.0',
