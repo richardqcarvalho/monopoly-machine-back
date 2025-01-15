@@ -13,7 +13,7 @@ import {
 	getRoom,
 	getRooms,
 } from './routes/room.js'
-import { getTransfers } from './routes/transfer.js'
+import { createTransfer, getTransfers } from './routes/transfer.js'
 
 fastify()
 	.register(fastifyCors, { origin: '*' })
@@ -27,6 +27,7 @@ fastify()
 	.post('/player', createPlayer)
 	.put('/player/:playerId', editPlayer)
 	.get('/transfers/:roomId', getTransfers)
+	.post('/transfers/:roomId', createTransfer)
 	.listen({
 		port: 4000,
 		host: '0.0.0.0',
