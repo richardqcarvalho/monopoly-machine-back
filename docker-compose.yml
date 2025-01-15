@@ -7,6 +7,12 @@ services:
       - 5432:5432
   app:
     build: .
+    volumes:
+      - ./src:/app/src
+      - ./.env:/app/.env
+      - ./drizzle.config.ts:/app/drizzle.config.ts
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
     ports:
       - 4000:4000
     depends_on:
