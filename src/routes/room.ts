@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { RouteHandlerMethod } from 'fastify'
 import db from '../db/index.js'
-import { roomsTable } from '../db/schema.js'
+import { roomsTable, transfersTable } from '../db/schema.js'
 import { CreateRoomT, EditRoomT, GetRoomT } from '../types/room.js'
 
 export const getRooms: RouteHandlerMethod = async (_request, reply) => {
@@ -10,7 +10,7 @@ export const getRooms: RouteHandlerMethod = async (_request, reply) => {
 	return reply.send(rooms)
 }
 
-export const getRoom: RouteHandlerMethod = async (request, reply) => {
+export const getRoomById: RouteHandlerMethod = async (request, reply) => {
 	const { roomId } = request.params as GetRoomT
 	const [room] = await db
 		.select()
@@ -52,10 +52,15 @@ export const editRoom: RouteHandlerMethod = async (request, reply) => {
 export const deleteRoom: RouteHandlerMethod = async (request, reply) => {
 	const { roomId } = request.params as GetRoomT
 
+	const transfers = await db
+		.delete(transfersTable)
+		.where(eq(transfersTable.room, roomId))
+		.returning()
+
 	const [room] = await db
 		.delete(roomsTable)
 		.where(eq(roomsTable.id, roomId))
 		.returning()
 
-	return reply.send(room)
+	return reply.send({ room, transfers })
 }

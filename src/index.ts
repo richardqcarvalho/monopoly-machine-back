@@ -3,30 +3,35 @@ import fastify from 'fastify'
 import {
 	createPlayer,
 	editPlayer,
-	getPlayer,
+	getPlayerById,
 	getPlayers,
 } from './routes/player.js'
 import {
 	createRoom,
 	deleteRoom,
 	editRoom,
-	getRoom,
+	getRoomById,
 	getRooms,
 } from './routes/room.js'
-import { createTransfer, getTransfers } from './routes/transfer.js'
+import {
+	createTransfer,
+	getTransfers,
+	getTransfersByRoomId,
+} from './routes/transfer.js'
 
 fastify()
 	.register(fastifyCors, { origin: '*' })
 	.get('/rooms', getRooms)
-	.get('/room/:roomId', getRoom)
+	.get('/room/:roomId', getRoomById)
 	.post('/room/:playerId', createRoom)
 	.put('/room/:roomId', editRoom)
 	.delete('/room/:roomId', deleteRoom)
 	.get('/players', getPlayers)
-	.get('/player/:playerId', getPlayer)
+	.get('/player/:playerId', getPlayerById)
 	.post('/player', createPlayer)
 	.put('/player/:playerId', editPlayer)
-	.get('/transfers/:roomId', getTransfers)
+	.get('/transfers', getTransfers)
+	.get('/transfers/:roomId', getTransfersByRoomId)
 	.post('/transfers/:roomId', createTransfer)
 	.listen({
 		port: 4000,

@@ -10,7 +10,7 @@ export const getPlayers: RouteHandlerMethod = async (_request, reply) => {
 	return reply.send(players)
 }
 
-export const getPlayer: RouteHandlerMethod = async (request, reply) => {
+export const getPlayerById: RouteHandlerMethod = async (request, reply) => {
 	const { playerId } = request.params as GetPlayerT
 	const [player] = await db
 		.select()

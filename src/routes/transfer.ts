@@ -5,7 +5,16 @@ import { transfersTable } from '../db/schema.js'
 import { GetRoomT } from '../types/room.js'
 import { CreateTransferT } from '../types/transfer.js'
 
-export const getTransfers: RouteHandlerMethod = async (request, reply) => {
+export const getTransfers: RouteHandlerMethod = async (_request, reply) => {
+	const transfers = await db.select().from(transfersTable)
+
+	return reply.send(transfers)
+}
+
+export const getTransfersByRoomId: RouteHandlerMethod = async (
+	request,
+	reply,
+) => {
 	const { roomId } = request.params as GetRoomT
 	const transfers = await db
 		.select()
