@@ -2,7 +2,12 @@ import { eq } from 'drizzle-orm'
 import { RouteHandlerMethod } from 'fastify'
 import db from '../db/index.js'
 import { roomsTable, transfersTable } from '../db/schema.js'
-import { CreateRoomT, EditRoomT, GetRoomT } from '../types/room.js'
+import {
+	CreateRoomBodyT,
+	CreateRoomParamsT,
+	EditRoomT,
+	GetRoomT,
+} from '../types/room.js'
 
 export const getRooms: RouteHandlerMethod = async (_request, reply) => {
 	const rooms = await db.select().from(roomsTable)
@@ -21,10 +26,13 @@ export const getRoomById: RouteHandlerMethod = async (request, reply) => {
 }
 
 export const createRoom: RouteHandlerMethod = async (request, reply) => {
-	const { playerId } = request.params as CreateRoomT
+	const { playerId } = request.params as CreateRoomParamsT
+	const { name, password } = request.body as CreateRoomBodyT
 	const [room] = await db
 		.insert(roomsTable)
 		.values({
+			name,
+			...(password && { password }),
 			banker: playerId,
 			players: [playerId],
 		})
@@ -35,11 +43,13 @@ export const createRoom: RouteHandlerMethod = async (request, reply) => {
 
 export const editRoom: RouteHandlerMethod = async (request, reply) => {
 	const { roomId } = request.params as GetRoomT
-	const { players, banker } = request.body as EditRoomT
+	const { name, password, players, banker } = request.body as EditRoomT
 
 	const [room] = await db
 		.update(roomsTable)
 		.set({
+			...(name && { name }),
+			...(password && { password }),
 			...(players && { players }),
 			...(banker && { banker }),
 		})
