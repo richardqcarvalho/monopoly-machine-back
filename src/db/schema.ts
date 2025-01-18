@@ -7,6 +7,8 @@ export const playersTable = pgTable('players', {
 
 export const roomsTable = pgTable('rooms', {
 	id: uuid().primaryKey().unique().defaultRandom(),
+	name: varchar().notNull().unique(),
+	password: varchar(),
 	players: uuid()
 		.references(() => playersTable.id)
 		.array()
