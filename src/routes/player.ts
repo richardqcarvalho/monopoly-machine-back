@@ -22,14 +22,23 @@ export const getPlayerById: RouteHandlerMethod = async (request, reply) => {
 
 export const createPlayer: RouteHandlerMethod = async (request, reply) => {
 	const { name } = request.body as CreatePlayerT
-	const [player] = await db
-		.insert(playersTable)
-		.values({
-			name,
-		})
-		.returning()
 
-	return reply.send(player)
+	const [player] = await db
+		.select()
+		.from(playersTable)
+		.where(eq(playersTable.name, name))
+
+	if (player) return reply.send(player)
+	else {
+		const [newPlayer] = await db
+			.insert(playersTable)
+			.values({
+				name,
+			})
+			.returning()
+
+		return reply.send(newPlayer)
+	}
 }
 
 export const editPlayer: RouteHandlerMethod = async (request, reply) => {
