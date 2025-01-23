@@ -2,6 +2,7 @@ import fastifyCors from '@fastify/cors'
 import fastify from 'fastify'
 import {
 	createPlayer,
+	deletePlayer,
 	editPlayer,
 	getPlayerById,
 	getPlayers,
@@ -30,6 +31,7 @@ fastify()
 	.get('/player/:playerId', getPlayerById)
 	.post('/player', createPlayer)
 	.put('/player/:playerId', editPlayer)
+	.delete('/player/:playerId', deletePlayer)
 	.get('/transfers', getTransfers)
 	.get('/transfers/:roomId', getTransfersByRoomId)
 	.post('/transfers/:roomId', createTransfer)

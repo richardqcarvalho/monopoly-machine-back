@@ -46,3 +46,14 @@ export const editPlayer: RouteHandlerMethod = async (request, reply) => {
 
 	return reply.send(player)
 }
+
+export const deletePlayer: RouteHandlerMethod = async (request, reply) => {
+	const { playerId } = request.params as GetPlayerT
+
+	const [player] = await db
+		.delete(playersTable)
+		.where(eq(playersTable.id, playerId))
+		.returning()
+
+	return reply.send(player)
+}
