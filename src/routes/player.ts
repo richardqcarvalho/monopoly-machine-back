@@ -4,6 +4,17 @@ import db from '../db/index.js'
 import { playersTable } from '../db/schema.js'
 import { CreatePlayerT, GetPlayerT } from '../types/player.js'
 
+export const login: RouteHandlerMethod = async (request, reply) => {
+	const { name, password } = request.body as CreatePlayerT
+	const [player] = await db
+		.select()
+		.from(playersTable)
+		.where(eq(playersTable.name, name))
+
+	if (player.password === password) return reply.send(player)
+	else return reply.status(401)
+}
+
 export const getPlayers: RouteHandlerMethod = async (_request, reply) => {
 	const players = await db.select().from(playersTable)
 
@@ -21,19 +32,20 @@ export const getPlayerById: RouteHandlerMethod = async (request, reply) => {
 }
 
 export const createPlayer: RouteHandlerMethod = async (request, reply) => {
-	const { name } = request.body as CreatePlayerT
+	const { name, password } = request.body as CreatePlayerT
 
 	const [player] = await db
 		.select()
 		.from(playersTable)
 		.where(eq(playersTable.name, name))
 
-	if (player) return reply.send(player)
+	if (player) return reply.status(409)
 	else {
 		const [newPlayer] = await db
 			.insert(playersTable)
 			.values({
 				name,
+				password,
 			})
 			.returning()
 

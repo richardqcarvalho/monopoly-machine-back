@@ -4,4 +4,5 @@ export type GetPlayerT = {
 
 export type CreatePlayerT = {
 	name: string
+	password: string
 }
