@@ -6,6 +6,7 @@ import {
 	editPlayer,
 	getPlayerById,
 	getPlayers,
+	login,
 } from './routes/player.js'
 import {
 	createRoom,
@@ -29,6 +30,7 @@ fastify()
 	.delete('/room/:roomId', deleteRoom)
 	.get('/players', getPlayers)
 	.get('/player/:playerId', getPlayerById)
+	.post('/login', login)
 	.post('/player', createPlayer)
 	.put('/player/:playerId', editPlayer)
 	.delete('/player/:playerId', deletePlayer)
