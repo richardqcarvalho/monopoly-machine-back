@@ -1,5 +1,5 @@
 export type CreateTransferT = {
-	from: string
-	to: string
-	amount: number
+  from: string
+  to: string
+  amount: number
 }

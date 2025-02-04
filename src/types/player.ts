@@ -1,8 +1,8 @@
 export type PlayerT = {
-	playerId: string
+  playerId: string
 }
 
 export type CreatePlayerT = {
-	name: string
-	password: string
+  name: string
+  password: string
 }

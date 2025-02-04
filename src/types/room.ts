@@ -1,19 +1,19 @@
 export type RoomT = {
-	roomId: string
+  roomId: string
 }
 
 export type GetRoomT = {
-	playerId: string
+  playerId: string
 }
 
 export type CreateRoomT = {
-	name: string
-	password?: string
+  name: string
+  password?: string
 }
 
 export type EditRoomT = {
-	name?: string
-	password?: string
-	players?: string[]
-	banker?: string
+  name?: string
+  password?: string
+  players?: string[]
+  banker?: string
 }
