@@ -45,7 +45,7 @@ export const playerRoutes = (server: FastifyInstance) =>
           password,
         })
 
-        return reply.status(200).send()
+        return reply.send()
       }
     })
     .put('/player/:playerId', async (request, reply) => {
