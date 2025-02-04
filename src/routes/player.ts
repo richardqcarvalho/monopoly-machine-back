@@ -12,7 +12,7 @@ export const login: RouteHandlerMethod = async (request, reply) => {
 		.where(eq(playersTable.name, name))
 
 	if (player.password === password) return reply.send(player)
-	else return reply.status(401)
+	else return reply.status(401).send()
 }
 
 export const getPlayers: RouteHandlerMethod = async (_request, reply) => {
@@ -39,14 +39,14 @@ export const createPlayer: RouteHandlerMethod = async (request, reply) => {
 		.from(playersTable)
 		.where(eq(playersTable.name, name))
 
-	if (player) return reply.status(409)
+	if (player) return reply.status(409).send()
 	else {
 		await db.insert(playersTable).values({
 			name,
 			password,
 		})
 
-		return reply.status(200)
+		return reply.status(200).send()
 	}
 }
 
