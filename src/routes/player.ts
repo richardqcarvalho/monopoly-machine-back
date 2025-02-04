@@ -40,7 +40,14 @@ export const createPlayer: RouteHandlerMethod = async (request, reply) => {
 		.where(eq(playersTable.name, name))
 
 	if (player) return reply.status(409)
-	else return reply.status(200)
+	else {
+		await db.insert(playersTable).values({
+			name,
+			password,
+		})
+
+		return reply.status(200)
+	}
 }
 
 export const editPlayer: RouteHandlerMethod = async (request, reply) => {
