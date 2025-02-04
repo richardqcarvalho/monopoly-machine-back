@@ -1,77 +1,74 @@
+import { db } from '@db'
+import { playersTable } from '@db/schema'
+import { CreatePlayerT, PlayerT } from '@type/player'
 import { eq } from 'drizzle-orm'
-import { RouteHandlerMethod } from 'fastify'
-import db from '../db/index.js'
-import { playersTable } from '../db/schema.js'
-import { CreatePlayerT, GetPlayerT } from '../types/player.js'
+import { FastifyInstance } from 'fastify'
 
-export const login: RouteHandlerMethod = async (request, reply) => {
-	const { name, password } = request.body as CreatePlayerT
-	const [player] = await db
-		.select()
-		.from(playersTable)
-		.where(eq(playersTable.name, name))
+export const playerRoutes = (server: FastifyInstance) =>
+	server
+		.get('/players', async (_request, reply) => {
+			const players = await db.select().from(playersTable)
 
-	if (player.password === password) return reply.send(player)
-	else return reply.status(401).send()
-}
-
-export const getPlayers: RouteHandlerMethod = async (_request, reply) => {
-	const players = await db.select().from(playersTable)
-
-	return reply.send(players)
-}
-
-export const getPlayerById: RouteHandlerMethod = async (request, reply) => {
-	const { playerId } = request.params as GetPlayerT
-	const [player] = await db
-		.select()
-		.from(playersTable)
-		.where(eq(playersTable.id, playerId))
-
-	return reply.send(player)
-}
-
-export const createPlayer: RouteHandlerMethod = async (request, reply) => {
-	const { name, password } = request.body as CreatePlayerT
-
-	const [player] = await db
-		.select()
-		.from(playersTable)
-		.where(eq(playersTable.name, name))
-
-	if (player) return reply.status(409).send()
-	else {
-		await db.insert(playersTable).values({
-			name,
-			password,
+			return reply.send(players)
 		})
+		.get('/player/:playerId', async (request, reply) => {
+			const { playerId } = request.params as PlayerT
+			const [player] = await db
+				.select()
+				.from(playersTable)
+				.where(eq(playersTable.id, playerId))
 
-		return reply.status(200).send()
-	}
-}
-
-export const editPlayer: RouteHandlerMethod = async (request, reply) => {
-	const { name } = request.body as CreatePlayerT
-	const { playerId } = request.params as GetPlayerT
-
-	const [player] = await db
-		.update(playersTable)
-		.set({
-			name,
+			return reply.send(player)
 		})
-		.where(eq(playersTable.id, playerId))
-		.returning()
+		.post('/login', async (request, reply) => {
+			const { name, password } = request.body as CreatePlayerT
+			const [player] = await db
+				.select()
+				.from(playersTable)
+				.where(eq(playersTable.name, name))
 
-	return reply.send(player)
-}
+			if (player.password === password) return reply.send(player)
+			else return reply.status(401).send()
+		})
+		.post('/player', async (request, reply) => {
+			const { name, password } = request.body as CreatePlayerT
 
-export const deletePlayer: RouteHandlerMethod = async (request, reply) => {
-	const { playerId } = request.params as GetPlayerT
+			const [player] = await db
+				.select()
+				.from(playersTable)
+				.where(eq(playersTable.name, name))
 
-	const [player] = await db
-		.delete(playersTable)
-		.where(eq(playersTable.id, playerId))
-		.returning()
+			if (player) return reply.status(409).send()
+			else {
+				await db.insert(playersTable).values({
+					name,
+					password,
+				})
 
-	return reply.send(player)
-}
+				return reply.status(200).send()
+			}
+		})
+		.put('/player/:playerId', async (request, reply) => {
+			const { name } = request.body as CreatePlayerT
+			const { playerId } = request.params as PlayerT
+
+			const [player] = await db
+				.update(playersTable)
+				.set({
+					name,
+				})
+				.where(eq(playersTable.id, playerId))
+				.returning()
+
+			return reply.send(player)
+		})
+		.delete('/player/:playerId', async (request, reply) => {
+			const { playerId } = request.params as PlayerT
+
+			const [player] = await db
+				.delete(playersTable)
+				.where(eq(playersTable.id, playerId))
+				.returning()
+
+			return reply.send(player)
+		})

@@ -1,4 +1,4 @@
-export type GetPlayerT = {
+export type PlayerT = {
 	playerId: string
 }
 

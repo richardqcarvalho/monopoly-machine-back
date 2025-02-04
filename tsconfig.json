@@ -1,11 +1,20 @@
 {
 	"compilerOptions": {
 		"lib": ["es2023"],
-		"module": "node16",
+		"module": "ESNext",
 		"target": "es2022",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"moduleResolution": "node16"
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"baseUrl": ".",
+		"paths": {
+			"@db": ["src/db"],
+			"@db/*": ["src/db/*"],
+			"@route/*": ["src/routes/*"],
+			"@type/*": ["src/types/*"]
+		}
 	}
 }

@@ -1,12 +1,12 @@
-export type GetRoomT = {
+export type RoomT = {
 	roomId: string
 }
 
-export type CreateRoomParamsT = {
+export type GetRoomT = {
 	playerId: string
 }
 
-export type CreateRoomBodyT = {
+export type CreateRoomT = {
 	name: string
 	password?: string
 }
