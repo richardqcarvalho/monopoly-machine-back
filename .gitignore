@@ -1,4 +1,4 @@
 node_modules
 *.lock*
 .env
-migrations
+src/db/migrations

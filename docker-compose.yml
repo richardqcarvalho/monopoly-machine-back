@@ -13,7 +13,7 @@ services:
       - ./drizzle.config.ts:/app/drizzle.config.ts
       - ./package.json:/app/package.json
       - ./tsconfig.json:/app/tsconfig.json
-      - ./migrations:/app/migrations
+      - ./src/db/migrations:/app/src/db/migrations
     ports:
       - 4000:4000
     depends_on:
