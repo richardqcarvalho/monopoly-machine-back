@@ -1,6 +1,6 @@
 import { db } from '@db'
 import { playersTable } from '@db/schema'
-import { CreatePlayerT, PlayerT } from '@type/player'
+import { CreatePlayerT, EditPlayerT, PlayerT } from '@type/player'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance } from 'fastify'
 
@@ -49,13 +49,14 @@ export const playerRoutes = (server: FastifyInstance) =>
       }
     })
     .put('/player/:playerId', async (request, reply) => {
-      const { name } = request.body as CreatePlayerT
+      const { name, password } = request.body as EditPlayerT
       const { playerId } = request.params as PlayerT
 
       const [player] = await db
         .update(playersTable)
         .set({
-          name,
+          ...(name && { name }),
+          ...(password && { password }),
         })
         .where(eq(playersTable.id, playerId))
         .returning()
