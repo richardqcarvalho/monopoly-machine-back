@@ -8,7 +8,7 @@ import { FastifyInstance, RouteHandlerMethod } from 'fastify'
 export const roomRoutes = (server: FastifyInstance) => {
   const getRooms: RouteHandlerMethod = async (_request, reply) => {
     const rooms = await instance
-      .select({ name: schemas.room.name })
+      .select({ id: schemas.room.id, name: schemas.room.name })
       .from(schemas.room)
 
     return reply.send(rooms)
