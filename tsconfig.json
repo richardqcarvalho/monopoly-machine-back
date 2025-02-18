@@ -12,7 +12,6 @@
     "baseUrl": ".",
     "paths": {
       "@db": ["src/db"],
-      "@db/*": ["src/db/*"],
       "@routes/*": ["src/routes/*"],
       "@typings/*": ["src/typings/*"]
     }

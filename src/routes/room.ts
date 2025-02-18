@@ -1,5 +1,4 @@
-import { db } from '@db'
-import { roomsTable, transfersTable } from '@db/schema'
+import { instance, schemas } from '@db'
 import { CreateRoomT, EditRoomT, GetRoomT, RoomT } from '@typings/room'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance } from 'fastify'
@@ -7,24 +6,24 @@ import { FastifyInstance } from 'fastify'
 export const roomRoutes = (server: FastifyInstance) =>
   server
     .get('/rooms', async (_request, reply) => {
-      const rooms = await db.select().from(roomsTable)
+      const rooms = await instance.select().from(schemas.room)
 
       return reply.send(rooms)
     })
     .get('/room/:roomId', async (request, reply) => {
       const { roomId } = request.params as RoomT
-      const [room] = await db
+      const [room] = await instance
         .select()
-        .from(roomsTable)
-        .where(eq(roomsTable.id, roomId))
+        .from(schemas.room)
+        .where(eq(schemas.room.id, roomId))
 
       return reply.send(room)
     })
     .post('/room/:playerId', async (request, reply) => {
       const { playerId } = request.params as GetRoomT
       const { name, password } = request.body as CreateRoomT
-      const [room] = await db
-        .insert(roomsTable)
+      const [room] = await instance
+        .insert(schemas.room)
         .values({
           name,
           ...(password && { password }),
@@ -39,15 +38,15 @@ export const roomRoutes = (server: FastifyInstance) =>
       const { roomId } = request.params as RoomT
       const { name, password, players, banker } = request.body as EditRoomT
 
-      const [room] = await db
-        .update(roomsTable)
+      const [room] = await instance
+        .update(schemas.room)
         .set({
           ...(name && { name }),
           ...(password && { password }),
           ...(players && { players }),
           ...(banker && { banker }),
         })
-        .where(eq(roomsTable.id, roomId))
+        .where(eq(schemas.room.id, roomId))
         .returning()
 
       return reply.send(room)
@@ -55,14 +54,14 @@ export const roomRoutes = (server: FastifyInstance) =>
     .delete('/room/:roomId', async (request, reply) => {
       const { roomId } = request.params as RoomT
 
-      const transfers = await db
-        .delete(transfersTable)
-        .where(eq(transfersTable.room, roomId))
+      const transfers = await instance
+        .delete(schemas.transfer)
+        .where(eq(schemas.transfer.room, roomId))
         .returning()
 
-      const [room] = await db
-        .delete(roomsTable)
-        .where(eq(roomsTable.id, roomId))
+      const [room] = await instance
+        .delete(schemas.room)
+        .where(eq(schemas.room.id, roomId))
         .returning()
 
       return reply.send({ room, transfers })
