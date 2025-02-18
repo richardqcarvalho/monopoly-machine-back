@@ -1,6 +1,6 @@
 import { db } from '@db'
 import { playersTable } from '@db/schema'
-import { CreatePlayerT, EditPlayerT, PlayerT } from '@type/player'
+import { CreatePlayerT, EditPlayerT, PlayerT } from '@typings/player'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance } from 'fastify'
 

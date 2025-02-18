@@ -13,8 +13,8 @@
     "paths": {
       "@db": ["src/db"],
       "@db/*": ["src/db/*"],
-      "@route/*": ["src/routes/*"],
-      "@type/*": ["src/types/*"]
+      "@routes/*": ["src/routes/*"],
+      "@typings/*": ["src/typings/*"]
     }
   }
 }

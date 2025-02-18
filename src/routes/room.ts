@@ -1,6 +1,6 @@
 import { db } from '@db'
 import { roomsTable, transfersTable } from '@db/schema'
-import { CreateRoomT, EditRoomT, GetRoomT, RoomT } from '@type/room'
+import { CreateRoomT, EditRoomT, GetRoomT, RoomT } from '@typings/room'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance } from 'fastify'
 

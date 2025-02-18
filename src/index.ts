@@ -1,7 +1,7 @@
 import fastifyCors from '@fastify/cors'
-import { playerRoutes } from '@route/player'
-import { roomRoutes } from '@route/room'
-import { transferRoutes } from '@route/transfer'
+import { playerRoutes } from '@routes/player'
+import { roomRoutes } from '@routes/room'
+import { transferRoutes } from '@routes/transfer'
 import fastify from 'fastify'
 
 const startServer = async () => {

@@ -1,7 +1,7 @@
 import { db } from '@db'
 import { transfersTable } from '@db/schema'
-import { RoomT } from '@type/room'
-import { CreateTransferT } from '@type/transfer'
+import { RoomT } from '@typings/room'
+import { CreateTransferT } from '@typings/transfer'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance } from 'fastify'
 
