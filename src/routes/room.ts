@@ -1,73 +1,93 @@
 import { instance, schemas } from '@db'
+import { PlayersT } from '@typings/player'
 import { CreateRoomT, EditRoomT, GetRoomT, RoomT } from '@typings/room'
+import { hash } from 'bcrypt'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance, RouteHandlerMethod } from 'fastify'
 
 export const roomRoutes = (server: FastifyInstance) => {
   const getRooms: RouteHandlerMethod = async (_request, reply) => {
-    const rooms = await instance.select().from(schemas.room)
+    const rooms = await instance
+      .select({ name: schemas.room.name })
+      .from(schemas.room)
 
     return reply.send(rooms)
   }
 
   const getRoom: RouteHandlerMethod = async (request, reply) => {
     const { roomId } = request.params as RoomT
+    const players: PlayersT = []
     const [room] = await instance
-      .select()
+      .select({
+        banker: schemas.room.banker,
+        players: schemas.room.players,
+        name: schemas.room.name,
+      })
       .from(schemas.room)
       .where(eq(schemas.room.id, roomId))
 
-    return reply.send(room)
+    for (const playerId of room.players) {
+      const [player] = await instance
+        .select({ id: schemas.player.id, name: schemas.player.name })
+        .from(schemas.player)
+        .where(eq(schemas.player.id, playerId))
+
+      players.push(player)
+    }
+
+    return reply.send({ ...room, players })
   }
 
   const createRoom: RouteHandlerMethod = async (request, reply) => {
     const { playerId } = request.params as GetRoomT
     const { name, password } = request.body as CreateRoomT
-    const [room] = await instance
-      .insert(schemas.room)
-      .values({
-        name,
-        ...(password && { password }),
-        banker: playerId,
-        players: [playerId],
-      })
-      .returning()
+    const encryptedPassword = password && (await hash(password, 16))
 
-    return reply.send(room)
+    await instance.insert(schemas.room).values({
+      name,
+      ...(encryptedPassword && { password: encryptedPassword }),
+      banker: playerId,
+      players: [playerId],
+    })
+
+    const rooms = await instance
+      .select({ name: schemas.room.name })
+      .from(schemas.room)
+
+    return reply.send(rooms)
   }
 
   const editRoom: RouteHandlerMethod = async (request, reply) => {
     const { roomId } = request.params as RoomT
     const { name, password, players, banker } = request.body as EditRoomT
+    const encryptedPassword = password && (await hash(password, 16))
 
-    const [room] = await instance
+    await instance
       .update(schemas.room)
       .set({
         ...(name && { name }),
-        ...(password && { password }),
+        ...(encryptedPassword && { password: encryptedPassword }),
         ...(players && { players }),
         ...(banker && { banker }),
       })
       .where(eq(schemas.room.id, roomId))
-      .returning()
 
-    return reply.send(room)
+    const rooms = await instance
+      .select({ name: schemas.room.name })
+      .from(schemas.room)
+
+    return reply.send(rooms)
   }
 
   const deleteRoom: RouteHandlerMethod = async (request, reply) => {
     const { roomId } = request.params as RoomT
 
-    const transfers = await instance
+    await instance
       .delete(schemas.transfer)
       .where(eq(schemas.transfer.room, roomId))
-      .returning()
+    await instance.delete(schemas.room).where(eq(schemas.room.id, roomId))
 
-    const [room] = await instance
-      .delete(schemas.room)
-      .where(eq(schemas.room.id, roomId))
-      .returning()
-
-    return reply.send({ room, transfers })
+    return reply.send()
   }
 
   return server

@@ -1,19 +1,14 @@
 import { instance, schemas } from '@db'
 import { CreatePlayerT, EditPlayerT, PlayerT } from '@typings/player'
+import { compare, hash } from 'bcrypt'
 import { eq } from 'drizzle-orm'
 import { FastifyInstance, RouteHandlerMethod } from 'fastify'
 
 export const playerRoutes = (server: FastifyInstance) => {
-  const getPlayers: RouteHandlerMethod = async (_request, reply) => {
-    const players = await instance.select().from(schemas.player)
-
-    return reply.send(players)
-  }
-
   const getPlayer: RouteHandlerMethod = async (request, reply) => {
     const { playerId } = request.params as PlayerT
     const [player] = await instance
-      .select()
+      .select({ id: schemas.player.id, name: schemas.player.name })
       .from(schemas.player)
       .where(eq(schemas.player.id, playerId))
 
@@ -26,8 +21,9 @@ export const playerRoutes = (server: FastifyInstance) => {
       .select()
       .from(schemas.player)
       .where(eq(schemas.player.name, name))
+    const passwordMatch = await compare(player.password, password)
 
-    if (player.password === password) return reply.send(player)
+    if (passwordMatch) return reply.send({ id: player.id, name: player.name })
     else return reply.status(401).send()
   }
 
@@ -35,15 +31,16 @@ export const playerRoutes = (server: FastifyInstance) => {
     const { name, password } = request.body as CreatePlayerT
 
     const [player] = await instance
-      .select()
+      .select({ id: schemas.player.id })
       .from(schemas.player)
       .where(eq(schemas.player.name, name))
 
     if (player) return reply.status(409).send()
     else {
+      const encryptedPassword = await hash(password, 16)
       await instance.insert(schemas.player).values({
         name,
-        password,
+        password: encryptedPassword,
       })
 
       return reply.send()
@@ -53,15 +50,16 @@ export const playerRoutes = (server: FastifyInstance) => {
   const editPlayer: RouteHandlerMethod = async (request, reply) => {
     const { name, password } = request.body as EditPlayerT
     const { playerId } = request.params as PlayerT
+    const encryptedPassword = password && (await hash(password, 16))
 
     const [player] = await instance
       .update(schemas.player)
       .set({
         ...(name && { name }),
-        ...(password && { password }),
+        ...(encryptedPassword && { password: encryptedPassword }),
       })
       .where(eq(schemas.player.id, playerId))
-      .returning()
+      .returning({ name: schemas.player.name })
 
     return reply.send(player)
   }
@@ -69,16 +67,12 @@ export const playerRoutes = (server: FastifyInstance) => {
   const deletePlayer: RouteHandlerMethod = async (request, reply) => {
     const { playerId } = request.params as PlayerT
 
-    const [player] = await instance
-      .delete(schemas.player)
-      .where(eq(schemas.player.id, playerId))
-      .returning()
+    await instance.delete(schemas.player).where(eq(schemas.player.id, playerId))
 
-    return reply.send(player)
+    return reply.send()
   }
 
   return server
-    .get('/players', getPlayers)
     .get('/player/:playerId', getPlayer)
     .post('/login', login)
     .post('/player', createPlayer)

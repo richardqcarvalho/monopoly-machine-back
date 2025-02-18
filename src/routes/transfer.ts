@@ -5,16 +5,14 @@ import { eq } from 'drizzle-orm'
 import { FastifyInstance, RouteHandlerMethod } from 'fastify'
 
 export const transferRoutes = (server: FastifyInstance) => {
-  const getTransfers: RouteHandlerMethod = async (_request, reply) => {
-    const transfers = await instance.select().from(schemas.transfer)
-
-    return reply.send(transfers)
-  }
-
-  const getTransfer: RouteHandlerMethod = async (request, reply) => {
+  const getTransfers: RouteHandlerMethod = async (request, reply) => {
     const { roomId } = request.params as RoomT
     const transfers = await instance
-      .select()
+      .select({
+        from: schemas.transfer.from,
+        to: schemas.transfer.to,
+        amount: schemas.transfer.amount,
+      })
       .from(schemas.transfer)
       .where(eq(schemas.transfer.room, roomId))
 
@@ -24,21 +22,27 @@ export const transferRoutes = (server: FastifyInstance) => {
   const createTransfer: RouteHandlerMethod = async (request, reply) => {
     const { roomId } = request.params as RoomT
     const { amount, from, to } = request.body as CreateTransferT
-    const [transfer] = await instance
-      .insert(schemas.transfer)
-      .values({
-        amount,
-        from,
-        to,
-        room: roomId,
-      })
-      .returning()
 
-    return reply.send(transfer)
+    await instance.insert(schemas.transfer).values({
+      amount,
+      from,
+      to,
+      room: roomId,
+    })
+
+    const transfers = await instance
+      .select({
+        from: schemas.transfer.from,
+        to: schemas.transfer.to,
+        amount: schemas.transfer.amount,
+      })
+      .from(schemas.transfer)
+      .where(eq(schemas.transfer.room, roomId))
+
+    return reply.send(transfers)
   }
 
   return server
-    .get('/transfers', getTransfers)
-    .get('/transfers/:roomId', getTransfer)
+    .get('/transfers/:roomId', getTransfers)
     .post('/transfers/:roomId', createTransfer)
 }

@@ -11,3 +11,7 @@ export type EditPlayerT = {
   name?: string
   password?: string
 }
+
+export type PlayersT = Array<{
+  name: string
+}>
