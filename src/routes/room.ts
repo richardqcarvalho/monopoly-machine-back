@@ -43,18 +43,21 @@ export const roomRoutes = (server: FastifyInstance) => {
     const { name, password } = request.body as CreateRoomT
     const encryptedPassword = password && (await hash(password, 16))
 
-    await instance.insert(schemas.room).values({
-      name,
-      ...(encryptedPassword && { password: encryptedPassword }),
-      banker: playerId,
-      players: [playerId],
-    })
+    const [room] = await instance
+      .insert(schemas.room)
+      .values({
+        name,
+        ...(encryptedPassword && { password: encryptedPassword }),
+        banker: playerId,
+        players: [playerId],
+      })
+      .returning({ id: schemas.room.id })
 
     const rooms = await instance
       .select({ name: schemas.room.name })
       .from(schemas.room)
 
-    return reply.send(rooms)
+    return reply.send({ roomId: room.id, rooms })
   }
 
   const editRoom: RouteHandlerMethod = async (request, reply) => {
