@@ -54,7 +54,7 @@ export const roomRoutes = (server: FastifyInstance) => {
       .returning({ id: schemas.room.id })
 
     const rooms = await instance
-      .select({ name: schemas.room.name })
+      .select({ id: schemas.room.id, name: schemas.room.name })
       .from(schemas.room)
 
     return reply.send({ roomId: room.id, rooms })
