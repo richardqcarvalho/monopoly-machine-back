@@ -21,6 +21,9 @@ export const playerRoutes = (server: FastifyInstance) => {
       .select()
       .from(schemas.player)
       .where(eq(schemas.player.name, name))
+
+    if (!player) return reply.status(401).send()
+
     const passwordMatch = await compare(password, player.password)
 
     if (passwordMatch) return reply.send({ id: player.id, name: player.name })
